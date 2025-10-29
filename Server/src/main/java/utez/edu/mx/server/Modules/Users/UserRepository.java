@@ -1,4 +1,4 @@
-package utez.edu.mx.server.Models.Users;
+package utez.edu.mx.server.Modules.Users;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

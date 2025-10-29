@@ -1,12 +1,27 @@
-import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css'
-import { useState } from 'react';
+import { useNavigate } from "react-router-dom";
+import { getUsuarios, eliminarUsuario } from "./services/usuariosService";
+import { useState, useEffect } from 'react';
 
 function App() {
-  const [usuarios, setUsuarios] = useState([
-    { id: 1, nombre: 'Juan', apellido: 'Pérez', correo: 'juan@example.com' },
-    { id: 2, nombre: 'Ana', apellido: 'López', correo: 'ana@example.com' },
-  ]);
+  const [usuarios, setUsuarios] = useState([]);
+  const navigate = useNavigate();
+
+  const cargarUsuarios = async () => {
+    const data = await getUsuarios();
+    setUsuarios(data);
+  };
+
+  const handleEliminar = async (id) => {
+    if (!window.confirm("¿Seguro que deseas eliminar este usuario?")) return;
+    const ok = await eliminarUsuario(id);
+    if (ok) cargarUsuarios();
+  };
+
+  useEffect(() => {
+    cargarUsuarios();
+  }, []);
+
   return (
     <div className="container mt-4">
       <h2 className="mb-3">Lista de Usuarios</h2>
@@ -16,29 +31,49 @@ function App() {
             <th>ID</th>
             <th>Nombre</th>
             <th>Apellido</th>
+            <th>Telefono</th>
             <th>Correo</th>
             <th>Acciones</th>
           </tr>
         </thead>
         <tbody>
-          {usuarios.map((user) => (
-            <tr key={user.id}>
-              <td>{user.id}</td>
-              <td>{user.nombre}</td>
-              <td>{user.apellido}</td>
-              <td>{user.correo}</td>
-              <td>
-                <button className='btn btn-primary btn-sm me-2'>Editar</button>
-                <button className='btn btn-danger btn-sm'>Eliminar</button>
-              </td>
+          {usuarios.length > 0 ? (
+            usuarios.map((user) => (
+              <tr key={user.id}>
+                <td>{user.id}</td>
+                <td>{user.nombre}</td>
+                <td>{user.apellido}</td>
+                <td>{user.telefono}</td>
+                <td>{user.correo}</td>
+                <td>
+                  <button
+                    className="btn btn-primary btn-sm me-2"
+                    onClick={() => navigate(`/form/${user.id}`)}
+                  >
+                    Editar
+                  </button>
+                  <button
+                    className="btn btn-danger btn-sm"
+                    onClick={() => handleEliminar(user.id)}
+                  >
+                    Eliminar
+                  </button>
+                </td>
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td colSpan="5" className="text-center">No hay usuarios</td>
             </tr>
-          ))}
+          )}
         </tbody>
       </table>
-      <br/>
-      <button className='btn btn-success'>Agregar Usuario + </button>
+
+      <button className="btn btn-success mt-3" onClick={() => navigate('/form')}>
+        Agregar Usuario +
+      </button>
     </div>
   );
 }
 
-export default App
+export default App;

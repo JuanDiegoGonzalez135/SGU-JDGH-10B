@@ -3,8 +3,8 @@ package utez.edu.mx.server.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import utez.edu.mx.server.Models.Users.UserRepository;
-import utez.edu.mx.server.Models.Users.Usuario;
+import utez.edu.mx.server.Modules.Users.UserRepository;
+import utez.edu.mx.server.Modules.Users.Usuario;
 import utez.edu.mx.server.Utils.APIResponse;
 
 import java.util.List;
@@ -18,6 +18,19 @@ public class UserService {
     public APIResponse FindAll(){
         List <Usuario> lista = userRepository.findAll();
         return new APIResponse(lista,false, "peticion exitosa :D" , HttpStatus.OK);
+    }
+
+    public APIResponse FindById(Long id){
+        try {
+            Optional<Usuario> found = userRepository.findById(id);
+        if (found.isPresent()){
+            return new APIResponse(found, false, "Operacion exitosa :D", HttpStatus.OK);
+        }
+        return new APIResponse( true, "Usuario no encontrado", HttpStatus.OK);
+        }catch (Exception ex){
+            ex.printStackTrace();
+            return new APIResponse(true ,"Ha ocurrido un error", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     public APIResponse Create(Usuario client){
